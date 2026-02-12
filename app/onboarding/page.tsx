@@ -105,7 +105,7 @@ function Field({
   name,
   label,
   placeholder,
-  defaultValue
+  defaultValue,
   required = true
 }: {
   name: string;
