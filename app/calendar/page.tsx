@@ -34,22 +34,29 @@ function readChecklist(value: unknown): Array<{ label: string; passed: boolean }
     .filter((entry): entry is { label: string; passed: boolean } => Boolean(entry));
 }
 
-type PageProps = {
-  searchParams?:
-    | {
-        month?: string;
-      }
-    | Promise<{
-        month?: string;
-      }>;
+type SearchParams = {
+  [key: string]: string | string[] | undefined;
 };
+
+type PageProps = {
+  searchParams?: Promise<SearchParams>;
+};
+
+function readSearchParam(params: SearchParams, key: string): string | undefined {
+  const value = params[key];
+  if (Array.isArray(value)) {
+    return value[0];
+  }
+
+  return value;
+}
 
 export default async function CalendarPage({ searchParams }: PageProps) {
   const user = await ensureDemoUser();
   const profile = await getPrimaryProfile(user.id);
-  const params = await Promise.resolve(searchParams);
+  const params = (await searchParams) ?? {};
 
-  const monthParam = params?.month ?? todayInTimezone(user.timezone).slice(0, 7);
+  const monthParam = readSearchParam(params, "month") ?? todayInTimezone(user.timezone).slice(0, 7);
   const [year, month] = monthParam.split("-").map((part) => Number(part));
   const baseDate = new Date(Date.UTC(year, (month || 1) - 1, 1, 8, 0, 0));
 
