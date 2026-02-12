@@ -1,0 +1,198 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+enum ContentFormat {
+  POST
+  STORY
+  CAROUSEL
+  REEL
+}
+
+enum CalendarStatus {
+  PLANNED
+  DRAFTED
+  READY
+  POSTED
+  SKIPPED
+}
+
+enum AssetType {
+  PROMPT
+  CAPTION
+  IMAGE
+  EXPORT
+}
+
+enum TrendSourceType {
+  NOTES
+  LINKS
+  BRIEF
+  CONNECTOR
+}
+
+model User {
+  id                 String              @id @default(cuid())
+  email              String              @unique
+  displayName        String?
+  timezone           String              @default("Europe/Berlin")
+  createdAt          DateTime            @default(now())
+  updatedAt          DateTime            @updatedAt
+  influencerProfiles InfluencerProfile[]
+  trendInputs        TrendInput[]
+  calendarItems      ContentCalendar[]
+  dailyBriefs        DailyBrief[]
+  assets             Asset[]
+  metrics            Metric[]
+
+  @@map("users")
+}
+
+model InfluencerProfile {
+  id                 String            @id @default(cuid())
+  userId             String
+  name               String?
+  handle             String?
+  niche              String
+  targetAudience     String
+  vibe               String
+  values             String
+  boundaries         String
+  languages          String
+  postingFrequency   String
+  growthGoal         String
+  referenceFaceImageId String?
+  bodyDescriptors    Json?
+  styleRules         Json?
+  cameraStyle        Json?
+  recurringLocations Json?
+  personaBio         String?
+  whyExists          String?
+  backstory          String?
+  personalityTraits  Json?
+  toneRules          Json?
+  doRules            Json?
+  dontRules          Json?
+  brandColors        Json?
+  captionStyle       String?
+  emojiRules         String?
+  photographyStyle   String?
+  recurringMotifs    Json?
+  contentPillars     Json?
+  nameIdeas          Json?
+  handleSuggestions  Json?
+  createdAt          DateTime          @default(now())
+  updatedAt          DateTime          @updatedAt
+  user               User              @relation(fields: [userId], references: [id], onDelete: Cascade)
+  calendarItems      ContentCalendar[]
+  assets             Asset[]
+
+  @@index([userId])
+  @@map("influencer_profiles")
+}
+
+model TrendInput {
+  id          String          @id @default(cuid())
+  userId      String
+  sourceType  TrendSourceType @default(BRIEF)
+  title       String?
+  rawText     String
+  sourceLinks Json?
+  summary     String?
+  themes      Json?
+  hooks       Json?
+  angles      Json?
+  createdAt   DateTime        @default(now())
+  updatedAt   DateTime        @updatedAt
+  user        User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@map("trend_inputs")
+}
+
+model ContentCalendar {
+  id              String          @id @default(cuid())
+  userId          String
+  profileId       String?
+  date            DateTime
+  format          ContentFormat
+  concept         String
+  caption         String
+  cta             String
+  hashtags        Json
+  promptJson      Json
+  safetyChecklist Json
+  pillar          String?
+  status          CalendarStatus  @default(PLANNED)
+  createdAt       DateTime        @default(now())
+  updatedAt       DateTime        @updatedAt
+  user            User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  profile         InfluencerProfile? @relation(fields: [profileId], references: [id], onDelete: SetNull)
+
+  @@index([userId, date])
+  @@map("content_calendar")
+}
+
+model DailyBrief {
+  id        String   @id @default(cuid())
+  userId    String
+  date      DateTime
+  payload   Json
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, date])
+  @@index([userId])
+  @@map("daily_briefs")
+}
+
+model Asset {
+  id         String            @id @default(cuid())
+  userId     String
+  profileId  String?
+  type       AssetType
+  title      String?
+  filePath   String?
+  mimeType   String?
+  promptJson Json?
+  captionText String?
+  tags       Json?
+  outfit     String?
+  location   String?
+  pillar     String?
+  assetDate  DateTime?
+  createdAt  DateTime          @default(now())
+  updatedAt  DateTime          @updatedAt
+  user       User              @relation(fields: [userId], references: [id], onDelete: Cascade)
+  profile    InfluencerProfile? @relation(fields: [profileId], references: [id], onDelete: SetNull)
+
+  @@index([userId, createdAt])
+  @@map("assets")
+}
+
+model Metric {
+  id             String   @id @default(cuid())
+  userId         String
+  date           DateTime
+  followers      Int
+  reach          Int
+  likes          Int
+  comments       Int
+  saves          Int
+  engagementRate Float?
+  notes          String?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+  user           User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, date])
+  @@index([userId])
+  @@map("metrics")
+}
