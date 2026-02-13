@@ -25,6 +25,38 @@ function parseList(value: string): string[] {
     .filter(Boolean);
 }
 
+const BLOCKED_IDENTITY_TERMS = [
+  "kardashian",
+  "hadid",
+  "jenner",
+  "swift",
+  "rihanna",
+  "beyonce",
+  "selena gomez"
+];
+
+function readStringValue(formData: FormData, key: string, fallback: string): string {
+  const values = formData
+    .getAll(key)
+    .map((entry) => String(entry).trim())
+    .filter(Boolean);
+
+  if (values.length > 1) {
+    return values.join(", ");
+  }
+
+  if (values.length === 1) {
+    return values[0];
+  }
+
+  return String(formData.get(key) ?? fallback);
+}
+
+function containsBlockedIdentity(values: string[]): boolean {
+  const text = values.join(" ").toLowerCase();
+  return BLOCKED_IDENTITY_TERMS.some((term) => text.includes(term));
+}
+
 function parseMonth(month: string): Date {
   const [year, monthIndex] = month.split("-").map((piece) => Number(piece));
   const safeYear = Number.isFinite(year) ? year : new Date().getUTCFullYear();
@@ -35,21 +67,43 @@ function parseMonth(month: string): Date {
 
 export async function saveOnboardingAction(formData: FormData) {
   const user = await ensureDemoUser();
+
+  const rightsConfirmed =
+    String(formData.get("referenceRightsConfirmed") ?? "").toLowerCase() === "on";
+  if (!rightsConfirmed) {
+    redirect("/onboarding?error=rights");
+  }
+
+  const safetyCheckValues = [
+    readStringValue(formData, "niche", ""),
+    readStringValue(formData, "targetAudience", ""),
+    readStringValue(formData, "vibe", ""),
+    readStringValue(formData, "values", ""),
+    readStringValue(formData, "boundaries", "")
+  ];
+
+  if (containsBlockedIdentity(safetyCheckValues)) {
+    redirect("/onboarding?error=identity");
+  }
+
   const referenceAsset = await storeReferenceFaceAsset(formData, user.id, user.timezone);
+  await storeInspirationAssets(formData, user.id, user.timezone);
   const referenceFaceImageId =
     referenceAsset?.id || String(formData.get("referenceFaceImageId") ?? "");
 
   await createBibleFromOnboarding(user.id, {
-    niche: String(formData.get("niche") ?? "fashion/travel/photography"),
-    targetAudience: String(formData.get("targetAudience") ?? "18-34 urban creators"),
-    vibe: String(formData.get("vibe") ?? "minimal cinematic"),
-    values: String(formData.get("values") ?? "creativity, discipline, authenticity"),
-    boundaries: String(
-      formData.get("boundaries") ?? "No nudity, no explicit content, no celebrity references"
+    niche: readStringValue(formData, "niche", "fashion/travel/photography"),
+    targetAudience: readStringValue(formData, "targetAudience", "18-34 urban creators"),
+    vibe: readStringValue(formData, "vibe", "minimal cinematic"),
+    values: readStringValue(formData, "values", "creativity, discipline, authenticity"),
+    boundaries: readStringValue(
+      formData,
+      "boundaries",
+      "No nudity, no explicit content, no celebrity references"
     ),
-    languages: String(formData.get("languages") ?? "English"),
-    postingFrequency: String(formData.get("postingFrequency") ?? "5 posts + daily stories"),
-    growthGoal: String(formData.get("growthGoal") ?? "Reach 10k followers in 6 months"),
+    languages: readStringValue(formData, "languages", "English"),
+    postingFrequency: readStringValue(formData, "postingFrequency", "5 posts + daily stories"),
+    growthGoal: readStringValue(formData, "growthGoal", "Reach 10k followers in 6 months"),
     referenceFaceImageId,
     bodyGuidelines: String(formData.get("bodyGuidelines") ?? "balanced proportions"),
     wardrobePalette: String(formData.get("wardrobePalette") ?? "black, cream, olive, denim"),
@@ -396,4 +450,37 @@ async function storeReferenceFaceAsset(formData: FormData, userId: string, timez
       assetDate: zonedDate(todayInTimezone(timezone), timezone)
     }
   });
+}
+
+async function storeInspirationAssets(formData: FormData, userId: string, timezone: string) {
+  const files = formData
+    .getAll("inspirationFiles")
+    .filter((entry): entry is File => entry instanceof File && entry.size > 0);
+
+  if (files.length === 0) {
+    return;
+  }
+
+  const uploadDir = path.join(process.cwd(), "public", "uploads");
+  await mkdir(uploadDir, { recursive: true });
+
+  for (const file of files) {
+    const ext = path.extname(file.name) || ".png";
+    const filename = `${Date.now()}-${randomUUID().slice(0, 8)}${ext}`;
+    const absolutePath = path.join(uploadDir, filename);
+    await writeFile(absolutePath, Buffer.from(await file.arrayBuffer()));
+
+    await prisma.asset.create({
+      data: {
+        userId,
+        type: "IMAGE",
+        title: `Onboarding inspiration - ${file.name}`,
+        filePath: `/uploads/${filename}`,
+        mimeType: file.type,
+        tags: ["inspiration", "character-lab", "visual-reference"],
+        pillar: "Identity",
+        assetDate: zonedDate(todayInTimezone(timezone), timezone)
+      }
+    });
+  }
 }

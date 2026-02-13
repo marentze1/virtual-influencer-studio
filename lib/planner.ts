@@ -70,8 +70,10 @@ const DEFAULT_PILLARS = [
 const PRESETS: PromptPreset[] = [
   "studio_portrait",
   "street_fashion",
+  "tunnel_streetwear",
   "airport_travel",
   "cafe_laptop",
+  "gym_training",
   "golden_hour_city_walk",
   "museum_gallery",
   "rooftop_sunset"

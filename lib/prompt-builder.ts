@@ -25,6 +25,13 @@ export const PROMPT_PRESETS: Record<PromptPreset, PresetConfig> = {
     angle: "slight low-angle walk frame",
     outfitDirection: "statement outfit with balanced textures and muted palette"
   },
+  tunnel_streetwear: {
+    instructions: "Underground tunnel fashion frame with athletic edge and clean perspective lines.",
+    locationStyle: "urban tunnel with neon reflections and concrete textures",
+    framing: "full body action frame",
+    angle: "ground-level dynamic angle for footwear emphasis",
+    outfitDirection: "streetwear layers with performance sneakers and bold silhouette"
+  },
   airport_travel: {
     instructions: "Travel lifestyle still with premium airport atmosphere and editorial composition.",
     locationStyle: "airport terminal corridor with motion blur in background",
@@ -38,6 +45,13 @@ export const PROMPT_PRESETS: Record<PromptPreset, PresetConfig> = {
     framing: "seated medium shot",
     angle: "over-table 30-degree angle",
     outfitDirection: "soft knit layers with minimalist jewelry"
+  },
+  gym_training: {
+    instructions: "Fitness lifestyle frame with disciplined movement and realistic workout energy.",
+    locationStyle: "high-end gym floor with clean mirrors and directional lights",
+    framing: "mid-body to full-body motion shot",
+    angle: "45-degree action angle with depth",
+    outfitDirection: "performance activewear with practical accessories"
   },
   golden_hour_city_walk: {
     instructions:
@@ -68,6 +82,17 @@ export function buildPromptJSON(
   format: ContentFormat | string
 ): InfluencerPromptJSON {
   const preset = PROMPT_PRESETS[input.preset];
+  const scene = input.scene ?? {
+    location: preset.locationStyle,
+    action: "calm editorial pose with natural body language",
+    props: []
+  };
+  const styleVariations = input.styleVariations ?? {
+    outfit: preset.outfitDirection,
+    makeup: "soft natural makeup, skin texture preserved",
+    jewelry: "minimal jewelry accents",
+    emotion: "confident and approachable"
+  };
 
   return {
     IMPORTANT_INSTRUCTION:
@@ -106,16 +131,32 @@ export function buildPromptJSON(
     },
     wardrobe: {
       palette_rules: "Follow wardrobe palette and avoid clashing high-saturation colors.",
-      outfit_direction: preset.outfitDirection
+      outfit_direction: styleVariations.outfit
+    },
+    scene: {
+      location: scene.location,
+      action: scene.action,
+      props: scene.props ?? []
+    },
+    style_variations: {
+      outfit: styleVariations.outfit,
+      makeup: styleVariations.makeup ?? "natural makeup with skin realism",
+      jewelry: styleVariations.jewelry ?? "minimal jewelry accents",
+      emotion: styleVariations.emotion ?? "confident and warm"
     },
     lighting: {
       direction: input.styleConstants.lighting,
       mood: "natural editorial lighting with dimensional highlights"
     },
+    output_target: {
+      generator: "nano_banana_compatible_json",
+      note: "Use this JSON as the exact structured prompt payload in your external generator."
+    },
     styling_notes: [
       "Keep texture realism in skin, fabric, and hair strands.",
       `Influencer identity: ${input.profileName}.`,
-      "Allow variation in emotion and pose while preserving core identity lock."
+      "Allow variation in emotion and pose while preserving core identity lock.",
+      `Scene target: ${scene.location} with action: ${scene.action}.`
     ],
     negatives: [
       "celebrity resemblance",
@@ -128,6 +169,9 @@ export function buildPromptJSON(
       "plastic skin or beauty filter",
       "anime, cartoon, CGI, 3D render look",
       "warped text or logos",
+      "brand watermark artifacts",
+      "over-sharpened AI skin texture",
+      "incorrect sneaker or clothing geometry",
       ...(input.styleConstants.negativeExtras ?? [])
     ]
   };

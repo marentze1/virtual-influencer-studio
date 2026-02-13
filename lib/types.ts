@@ -3,8 +3,10 @@ import type { ContentFormat } from "@prisma/client";
 export type PromptPreset =
   | "studio_portrait"
   | "street_fashion"
+  | "tunnel_streetwear"
   | "airport_travel"
   | "cafe_laptop"
+  | "gym_training"
   | "golden_hour_city_walk"
   | "museum_gallery"
   | "rooftop_sunset";
@@ -22,6 +24,17 @@ export type PromptTemplateInput = {
     lighting: string;
     backgroundStyle: string;
     negativeExtras?: string[];
+  };
+  scene?: {
+    location: string;
+    action: string;
+    props?: string[];
+  };
+  styleVariations?: {
+    outfit: string;
+    makeup?: string;
+    jewelry?: string;
+    emotion?: string;
   };
 };
 
@@ -61,9 +74,24 @@ export type InfluencerPromptJSON = {
     palette_rules: string;
     outfit_direction: string;
   };
+  scene: {
+    location: string;
+    action: string;
+    props: string[];
+  };
+  style_variations: {
+    outfit: string;
+    makeup: string;
+    jewelry: string;
+    emotion: string;
+  };
   lighting: {
     direction: string;
     mood: string;
+  };
+  output_target: {
+    generator: "nano_banana_compatible_json";
+    note: string;
   };
   styling_notes: string[];
   negatives: string[];

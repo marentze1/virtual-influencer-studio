@@ -19,6 +19,13 @@ export async function POST(request: Request) {
     concept?: string;
     preset?: PromptPreset;
     format?: "POST" | "STORY" | "CAROUSEL" | "REEL";
+    sceneLocation?: string;
+    sceneAction?: string;
+    sceneProps?: string[];
+    outfit?: string;
+    makeup?: string;
+    jewelry?: string;
+    emotion?: string;
   };
 
   if (!body.profileId || !body.concept || !body.preset) {
@@ -56,6 +63,17 @@ export async function POST(request: Request) {
       lighting: "Natural key + soft fill with cinematic depth",
       backgroundStyle,
       negativeExtras: ["identity drift", "plastic skin", "CGI look"]
+    },
+    scene: {
+      location: body.sceneLocation ?? "Curated city scene",
+      action: body.sceneAction ?? "Natural movement with confident posture",
+      props: Array.isArray(body.sceneProps) ? body.sceneProps : []
+    },
+    styleVariations: {
+      outfit: body.outfit ?? "Capsule wardrobe, premium streetwear balance",
+      makeup: body.makeup ?? "Natural makeup with skin texture preserved",
+      jewelry: body.jewelry ?? "Minimal silver accents",
+      emotion: body.emotion ?? "confident and approachable"
     }
   };
 

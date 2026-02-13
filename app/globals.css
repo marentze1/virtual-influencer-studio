@@ -3,9 +3,9 @@
 @tailwind utilities;
 
 :root {
-  --bg-top: #f1ebe1;
-  --bg-bottom: #d8e3dd;
-  --ink: #102420;
+  --bg-top: #f8f7f3;
+  --bg-bottom: #dfe7e3;
+  --ink: #14211f;
 }
 
 * {
@@ -19,8 +19,8 @@ body {
 }
 
 body {
-  background: radial-gradient(circle at 10% 0%, #fff6e7, transparent 35%),
-    radial-gradient(circle at 90% 20%, #cfe2dd, transparent 42%),
+  background: radial-gradient(circle at 8% -5%, #fff9ee, transparent 34%),
+    radial-gradient(circle at 92% 22%, #d2e7e1, transparent 42%),
     linear-gradient(160deg, var(--bg-top), var(--bg-bottom));
   color: var(--ink);
 }
@@ -28,23 +28,28 @@ body {
 input,
 textarea,
 select {
-  @apply w-full rounded-xl border border-ink/15 bg-white px-3 py-2 text-sm text-ink shadow-sm outline-none transition;
+  @apply w-full rounded-xl border border-ink/15 bg-white/90 px-3 py-2 text-sm text-ink shadow-sm outline-none transition;
 }
 
 input:focus,
 textarea:focus,
 select:focus {
-  @apply border-ink/45 ring-2 ring-aqua/40;
+  @apply border-ink/45 ring-2 ring-aqua/35;
 }
 
 button {
-  @apply rounded-xl bg-ink px-4 py-2 text-sm font-medium text-stone transition hover:bg-ink/90;
+  @apply rounded-xl bg-ink px-4 py-2 text-sm font-medium text-stone transition hover:bg-ink/90 active:scale-[0.99];
 }
 
 .muted-button {
-  @apply bg-white text-ink border border-ink/15 hover:border-ink/40;
+  @apply border border-ink/15 bg-white text-ink hover:border-ink/40;
 }
 
 label {
   @apply mb-1 block text-xs uppercase tracking-[0.12em] text-ink/55;
+}
+
+pre {
+  white-space: pre-wrap;
+  word-break: break-word;
 }
