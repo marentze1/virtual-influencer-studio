@@ -4,24 +4,24 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import clsx from "clsx";
 
-const links = [
-  { href: "/", label: "Dashboard", hint: "Studio overview" },
-  { href: "/character-lab", label: "Character Lab", hint: "Build face + style DNA" },
-  { href: "/onboarding", label: "Onboarding", hint: "Wizard setup" },
-  { href: "/profile", label: "Influencer Bible", hint: "Identity rules" },
-  { href: "/trends", label: "Trends", hint: "Research briefs" },
-  { href: "/calendar", label: "Monthly Planner", hint: "30-day plan" },
-  { href: "/today", label: "Today", hint: "Daily mission" },
-  { href: "/assets", label: "Assets", hint: "Prompt + media library" },
-  { href: "/analytics", label: "Analytics", hint: "Growth tracking" },
-  { href: "/settings", label: "Settings", hint: "Workspace config" }
+const primaryLinks = [
+  { href: "/", label: "Studio" },
+  { href: "/character-lab", label: "Create" },
+  { href: "/calendar", label: "Plan" },
+  { href: "/today", label: "Execute" },
+  { href: "/assets", label: "Library" },
+  { href: "/analytics", label: "Insights" }
+];
+
+const secondaryLinks = [
+  { href: "/onboarding", label: "Onboarding" },
+  { href: "/profile", label: "Bible" },
+  { href: "/trends", label: "Trends" },
+  { href: "/settings", label: "Settings" }
 ];
 
 function isActive(pathname: string, href: string): boolean {
-  if (href === "/") {
-    return pathname === "/";
-  }
-
+  if (href === "/") return pathname === "/";
   return pathname === href || pathname.startsWith(`${href}/`);
 }
 
@@ -29,26 +29,46 @@ export function MainNav() {
   const pathname = usePathname();
 
   return (
-    <nav className="space-y-1">
-      {links.map((link) => {
-        const active = isActive(pathname, link.href);
+    <nav className="space-y-3">
+      <div className="grid grid-cols-3 gap-2">
+        {primaryLinks.map((link) => {
+          const active = isActive(pathname, link.href);
+          return (
+            <Link
+              key={link.href}
+              href={link.href}
+              className={clsx(
+                "rounded-xl border px-3 py-2 text-center text-sm transition",
+                active
+                  ? "border-ink bg-ink text-stone"
+                  : "border-ink/20 bg-white/70 text-ink hover:border-ink/45"
+              )}
+            >
+              {link.label}
+            </Link>
+          );
+        })}
+      </div>
 
-        return (
-          <Link
-            key={link.href}
-            href={link.href}
-            className={clsx(
-              "block rounded-2xl border px-4 py-3 transition",
-              active
-                ? "border-ink/90 bg-ink text-stone shadow-soft"
-                : "border-ink/10 bg-white/65 text-ink hover:border-ink/35 hover:bg-white"
-            )}
-          >
-            <p className="text-sm font-medium">{link.label}</p>
-            <p className={clsx("mt-1 text-xs", active ? "text-stone/80" : "text-ink/55")}>{link.hint}</p>
-          </Link>
-        );
-      })}
+      <div className="flex flex-wrap gap-2">
+        {secondaryLinks.map((link) => {
+          const active = isActive(pathname, link.href);
+          return (
+            <Link
+              key={link.href}
+              href={link.href}
+              className={clsx(
+                "rounded-full border px-3 py-1.5 text-xs uppercase tracking-[0.08em] transition",
+                active
+                  ? "border-ink/90 bg-ink/90 text-stone"
+                  : "border-ink/15 bg-white/60 text-ink/80 hover:border-ink/40"
+              )}
+            >
+              {link.label}
+            </Link>
+          );
+        })}
+      </div>
     </nav>
   );
 }

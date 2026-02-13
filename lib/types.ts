@@ -36,6 +36,12 @@ export type PromptTemplateInput = {
     jewelry?: string;
     emotion?: string;
   };
+  referenceImages?: Array<{
+    image_id: string;
+    role: "identity_primary" | "style_outfit" | "environment_mood" | "pose_reference";
+    weight?: number;
+    lockIdentity?: boolean;
+  }>;
 };
 
 export type InfluencerPromptJSON = {
@@ -60,6 +66,13 @@ export type InfluencerPromptJSON = {
     lock_skin_tone: true;
     instruction: string;
   };
+  reference_inputs: Array<{
+    image_id: string;
+    role: string;
+    weight: number;
+    lock_identity: boolean;
+    instruction: string;
+  }>;
   body_consistency: {
     fixed_descriptors: string[];
     instruction: string;

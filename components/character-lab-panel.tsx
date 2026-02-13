@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { useState } from "react";
 
 type UploadedReference = {
@@ -179,11 +180,14 @@ export function CharacterLabPanel() {
       {references.length > 0 ? (
         <div className="rounded-2xl border border-ink/10 bg-white/75 p-4">
           <p className="text-xs uppercase tracking-[0.12em] text-ink/55">Uploaded references</p>
-          <div className="mt-3 grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
+          <div className="mt-3 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
             {references.map((item) => (
-              <p key={item.id} className="rounded-xl border border-ink/10 bg-white px-3 py-2 text-xs text-ink/75">
-                {item.id}
-              </p>
+              <article key={item.id} className="overflow-hidden rounded-xl border border-ink/10 bg-white">
+                <div className="relative h-28 w-full bg-ink/5">
+                  <Image src={item.filePath} alt={item.id} fill className="object-cover" />
+                </div>
+                <p className="truncate px-3 py-2 text-xs text-ink/70">{item.id}</p>
+              </article>
             ))}
           </div>
         </div>

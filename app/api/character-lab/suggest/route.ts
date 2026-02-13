@@ -68,7 +68,25 @@ function buildCandidate(index: number, body: SuggestBody) {
       makeup: "natural matte skin and soft contour",
       jewelry: "minimal silver jewelry",
       emotion: "confident, curious, approachable"
-    }
+    },
+    referenceImages: [
+      {
+        image_id: body.referenceImageIds?.[0] ?? `candidate_ref_${index + 1}`,
+        role: "identity_primary",
+        weight: 1.2,
+        lockIdentity: true
+      },
+      ...(body.referenceImageIds?.[1]
+        ? [
+            {
+              image_id: body.referenceImageIds[1],
+              role: "style_outfit" as const,
+              weight: 0.95,
+              lockIdentity: false
+            }
+          ]
+        : [])
+    ]
   };
 
   return {

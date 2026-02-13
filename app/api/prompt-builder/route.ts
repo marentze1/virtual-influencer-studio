@@ -26,6 +26,9 @@ export async function POST(request: Request) {
     makeup?: string;
     jewelry?: string;
     emotion?: string;
+    identityImageId?: string;
+    outfitImageId?: string;
+    moodImageId?: string;
   };
 
   if (!body.profileId || !body.concept || !body.preset) {
@@ -74,7 +77,35 @@ export async function POST(request: Request) {
       makeup: body.makeup ?? "Natural makeup with skin texture preserved",
       jewelry: body.jewelry ?? "Minimal silver accents",
       emotion: body.emotion ?? "confident and approachable"
-    }
+    },
+    referenceImages: [
+      {
+        image_id: body.identityImageId || profile.referenceFaceImageId || "NO_REFERENCE_IMAGE",
+        role: "identity_primary",
+        weight: 1.25,
+        lockIdentity: true
+      },
+      ...(body.outfitImageId
+        ? [
+            {
+              image_id: body.outfitImageId,
+              role: "style_outfit" as const,
+              weight: 0.95,
+              lockIdentity: false
+            }
+          ]
+        : []),
+      ...(body.moodImageId
+        ? [
+            {
+              image_id: body.moodImageId,
+              role: "environment_mood" as const,
+              weight: 0.8,
+              lockIdentity: false
+            }
+          ]
+        : [])
+    ]
   };
 
   const promptJson = await generatePromptJSON({

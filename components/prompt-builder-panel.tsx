@@ -38,6 +38,9 @@ export function PromptBuilderPanel({ profileId }: { profileId: string }) {
   const [makeup, setMakeup] = useState("natural matte finish, soft defined eyes");
   const [jewelry, setJewelry] = useState("silver hoops + slim rings");
   const [emotion, setEmotion] = useState("focused confidence");
+  const [identityImageId, setIdentityImageId] = useState("asset_ref_identity_001");
+  const [outfitImageId, setOutfitImageId] = useState("");
+  const [moodImageId, setMoodImageId] = useState("");
   const [loading, setLoading] = useState(false);
   const [sending, setSending] = useState(false);
   const [result, setResult] = useState<BuilderResult | null>(null);
@@ -73,7 +76,10 @@ export function PromptBuilderPanel({ profileId }: { profileId: string }) {
           outfit,
           makeup,
           jewelry,
-          emotion
+          emotion,
+          identityImageId,
+          outfitImageId,
+          moodImageId
         })
       });
 
@@ -179,6 +185,32 @@ export function PromptBuilderPanel({ profileId }: { profileId: string }) {
             id="pb-scene-props"
             value={sceneProps}
             onChange={(event) => setSceneProps(event.target.value)}
+          />
+        </div>
+        <div>
+          <label htmlFor="pb-identity-image">Identity image id (image1)</label>
+          <input
+            id="pb-identity-image"
+            value={identityImageId}
+            onChange={(event) => setIdentityImageId(event.target.value)}
+          />
+        </div>
+        <div>
+          <label htmlFor="pb-outfit-image">Outfit/style image id (image2, optional)</label>
+          <input
+            id="pb-outfit-image"
+            value={outfitImageId}
+            onChange={(event) => setOutfitImageId(event.target.value)}
+            placeholder="asset_ref_outfit_002"
+          />
+        </div>
+        <div>
+          <label htmlFor="pb-mood-image">Mood/location image id (optional)</label>
+          <input
+            id="pb-mood-image"
+            value={moodImageId}
+            onChange={(event) => setMoodImageId(event.target.value)}
+            placeholder="asset_ref_mood_003"
           />
         </div>
         <div>

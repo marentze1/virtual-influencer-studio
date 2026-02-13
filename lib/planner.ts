@@ -268,7 +268,15 @@ export async function generateMonthPlan(
         lighting: "Natural directional key + soft fill, cinematic realism",
         backgroundStyle: styleRules[0] ?? "Clean, realistic location background",
         negativeExtras: ["oversmoothed skin", "low-res textures", "overprocessed HDR"]
-      }
+      },
+      referenceImages: [
+        {
+          image_id: profile.referenceFaceImageId ?? "NO_REFERENCE_IMAGE",
+          role: "identity_primary",
+          weight: 1.2,
+          lockIdentity: true
+        }
+      ]
     };
 
     const promptJson = await generatePromptJSON({ template, format });

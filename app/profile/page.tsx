@@ -149,7 +149,7 @@ export default async function ProfilePage() {
 
       <Surface
         title="Prompt Builder"
-        subtitle="Generate preset-based JSON prompts with identity/body/style consistency locks."
+        subtitle="Generate scene-ready JSON with identity lock + optional outfit/mood reference images."
       >
         <PromptBuilderPanel profileId={profile.id} />
       </Surface>

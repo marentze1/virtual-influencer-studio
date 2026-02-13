@@ -85,15 +85,21 @@ export default async function CalendarPage({ searchParams }: PageProps) {
   return (
     <div className="space-y-6">
       <Surface title="Monthly Planner" subtitle="Generate a 30-day content map with prompt JSON templates.">
-        <form action={regenerateMonthPlanAction} className="flex flex-wrap items-end gap-3">
-          <div>
-            <label htmlFor="month">Month</label>
-            <input id="month" name="month" type="month" defaultValue={monthParam} />
+        <div className="grid gap-4 md:grid-cols-[1fr_auto] md:items-end">
+          <form action={regenerateMonthPlanAction} className="flex flex-wrap items-end gap-3">
+            <div>
+              <label htmlFor="month">Month</label>
+              <input id="month" name="month" type="month" defaultValue={monthParam} />
+            </div>
+            <button type="submit" disabled={!profile}>
+              {items.length > 0 ? "Regenerate month plan" : "Generate month plan"}
+            </button>
+          </form>
+          <div className="grid grid-cols-2 gap-2 text-xs uppercase tracking-[0.1em] text-ink/55">
+            <Metric label="Days planned" value={items.length} />
+            <Metric label="Timezone" value={user.timezone} />
           </div>
-          <button type="submit" disabled={!profile}>
-            {items.length > 0 ? "Regenerate month plan" : "Generate month plan"}
-          </button>
-        </form>
+        </div>
         {!profile ? (
           <p className="mt-3 text-sm text-ink/70">Complete onboarding first to generate plans.</p>
         ) : null}
@@ -126,65 +132,83 @@ export default async function CalendarPage({ searchParams }: PageProps) {
         <div className="space-y-4">
           {items.length === 0 ? <p className="text-sm text-ink/70">No entries for this month yet.</p> : null}
           {items.map((item) => (
-            <form key={item.id} action={updateCalendarItemAction} className="rounded-2xl border border-ink/10 bg-white p-4">
-              <input type="hidden" name="itemId" value={item.id} />
-              <p className="text-xs uppercase tracking-[0.1em] text-ink/55">
-                {formatInTimeZone(item.date, user.timezone, "yyyy-MM-dd")} · {item.format}
-              </p>
-              <div className="mt-3 grid gap-3 md:grid-cols-2">
-                <div className="md:col-span-2">
-                  <label htmlFor={`concept-${item.id}`}>Concept</label>
-                  <textarea id={`concept-${item.id}`} name="concept" rows={2} defaultValue={item.concept} />
+            <details key={item.id} className="rounded-2xl border border-ink/10 bg-white/80 p-4">
+              <summary className="cursor-pointer list-none">
+                <div className="flex flex-wrap items-center justify-between gap-2">
+                  <p className="text-sm font-semibold text-ink">
+                    {formatInTimeZone(item.date, user.timezone, "yyyy-MM-dd")} · {item.format}
+                  </p>
+                  <p className="rounded-full border border-ink/15 bg-white px-2 py-1 text-xs text-ink/70">{item.status}</p>
                 </div>
-                <div className="md:col-span-2">
-                  <label htmlFor={`caption-${item.id}`}>Caption draft</label>
-                  <textarea id={`caption-${item.id}`} name="caption" rows={3} defaultValue={item.caption} />
+                <p className="mt-2 text-sm text-ink/75">{item.concept}</p>
+              </summary>
+
+              <form action={updateCalendarItemAction} className="mt-4 border-t border-ink/10 pt-4">
+                <input type="hidden" name="itemId" value={item.id} />
+                <div className="grid gap-3 md:grid-cols-2">
+                  <div className="md:col-span-2">
+                    <label htmlFor={`concept-${item.id}`}>Concept</label>
+                    <textarea id={`concept-${item.id}`} name="concept" rows={2} defaultValue={item.concept} />
+                  </div>
+                  <div className="md:col-span-2">
+                    <label htmlFor={`caption-${item.id}`}>Caption draft</label>
+                    <textarea id={`caption-${item.id}`} name="caption" rows={3} defaultValue={item.caption} />
+                  </div>
+                  <div>
+                    <label htmlFor={`cta-${item.id}`}>CTA</label>
+                    <input id={`cta-${item.id}`} name="cta" defaultValue={item.cta} />
+                  </div>
+                  <div>
+                    <label htmlFor={`status-${item.id}`}>Status</label>
+                    <select id={`status-${item.id}`} name="status" defaultValue={item.status}>
+                      <option value="PLANNED">PLANNED</option>
+                      <option value="DRAFTED">DRAFTED</option>
+                      <option value="READY">READY</option>
+                      <option value="POSTED">POSTED</option>
+                      <option value="SKIPPED">SKIPPED</option>
+                    </select>
+                  </div>
+                  <div className="md:col-span-2">
+                    <label htmlFor={`hashtags-${item.id}`}>Hashtags (comma or newline separated)</label>
+                    <textarea
+                      id={`hashtags-${item.id}`}
+                      name="hashtags"
+                      rows={2}
+                      defaultValue={readArray(item.hashtags).join(", ")}
+                    />
+                  </div>
                 </div>
-                <div>
-                  <label htmlFor={`cta-${item.id}`}>CTA</label>
-                  <input id={`cta-${item.id}`} name="cta" defaultValue={item.cta} />
+                <div className="mt-3 flex flex-wrap items-center gap-3">
+                  <button type="submit">Save Item</button>
+                  <details>
+                    <summary className="cursor-pointer text-sm text-ink/70">Prompt JSON</summary>
+                    <pre className="mt-2 max-h-64 overflow-auto rounded-xl bg-ink/95 p-3 text-xs text-stone">
+                      {JSON.stringify(item.promptJson, null, 2)}
+                    </pre>
+                  </details>
+                  <details>
+                    <summary className="cursor-pointer text-sm text-ink/70">Safety & Originality</summary>
+                    <ul className="mt-2 space-y-1 text-xs text-ink/80">
+                      {readChecklist(item.safetyChecklist).map((check) => (
+                        <li key={check.label}>{check.passed ? "[OK]" : "[ ]"} {check.label}</li>
+                      ))}
+                    </ul>
+                  </details>
                 </div>
-                <div>
-                  <label htmlFor={`status-${item.id}`}>Status</label>
-                  <select id={`status-${item.id}`} name="status" defaultValue={item.status}>
-                    <option value="PLANNED">PLANNED</option>
-                    <option value="DRAFTED">DRAFTED</option>
-                    <option value="READY">READY</option>
-                    <option value="POSTED">POSTED</option>
-                    <option value="SKIPPED">SKIPPED</option>
-                  </select>
-                </div>
-                <div className="md:col-span-2">
-                  <label htmlFor={`hashtags-${item.id}`}>Hashtags (comma or newline separated)</label>
-                  <textarea
-                    id={`hashtags-${item.id}`}
-                    name="hashtags"
-                    rows={2}
-                    defaultValue={readArray(item.hashtags).join(", ")}
-                  />
-                </div>
-              </div>
-              <div className="mt-3 flex items-center gap-3">
-                <button type="submit">Save Item</button>
-                <details>
-                  <summary className="cursor-pointer text-sm text-ink/70">Prompt JSON</summary>
-                  <pre className="mt-2 max-h-64 overflow-auto rounded-xl bg-ink/95 p-3 text-xs text-stone">
-                    {JSON.stringify(item.promptJson, null, 2)}
-                  </pre>
-                </details>
-                <details>
-                  <summary className="cursor-pointer text-sm text-ink/70">Safety & Originality</summary>
-                  <ul className="mt-2 space-y-1 text-xs text-ink/80">
-                    {readChecklist(item.safetyChecklist).map((check) => (
-                      <li key={check.label}>{check.passed ? "[OK]" : "[ ]"} {check.label}</li>
-                    ))}
-                  </ul>
-                </details>
-              </div>
-            </form>
+              </form>
+            </details>
           ))}
         </div>
       </Surface>
+    </div>
+  );
+}
+
+function Metric({ label, value }: { label: string; value: string | number }) {
+  return (
+    <div className="rounded-xl border border-ink/10 bg-white px-3 py-2">
+      <p>{label}</p>
+      <p className="mt-1 text-sm font-semibold tracking-normal text-ink">{value}</p>
     </div>
   );
 }

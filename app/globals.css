@@ -3,9 +3,9 @@
 @tailwind utilities;
 
 :root {
-  --bg-top: #f8f7f3;
-  --bg-bottom: #dfe7e3;
-  --ink: #14211f;
+  --bg-base: #eff1f5;
+  --bg-panel: rgba(255, 255, 255, 0.84);
+  --ink: #11161c;
 }
 
 * {
@@ -19,22 +19,23 @@ body {
 }
 
 body {
-  background: radial-gradient(circle at 8% -5%, #fff9ee, transparent 34%),
-    radial-gradient(circle at 92% 22%, #d2e7e1, transparent 42%),
-    linear-gradient(160deg, var(--bg-top), var(--bg-bottom));
+  background:
+    radial-gradient(circle at 0% 0%, #ffffff 0%, transparent 40%),
+    radial-gradient(circle at 90% 12%, #d9e9ff 0%, transparent 35%),
+    linear-gradient(160deg, #f6f7fb 0%, var(--bg-base) 100%);
   color: var(--ink);
 }
 
 input,
 textarea,
 select {
-  @apply w-full rounded-xl border border-ink/15 bg-white/90 px-3 py-2 text-sm text-ink shadow-sm outline-none transition;
+  @apply w-full rounded-xl border border-ink/15 bg-white/95 px-3 py-2 text-sm text-ink shadow-sm outline-none transition;
 }
 
 input:focus,
 textarea:focus,
 select:focus {
-  @apply border-ink/45 ring-2 ring-aqua/35;
+  @apply border-ink/50 ring-2 ring-[#3f7cff]/25;
 }
 
 button {
@@ -52,4 +53,19 @@ label {
 pre {
   white-space: pre-wrap;
   word-break: break-word;
+}
+
+@keyframes fadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+main > * {
+  animation: fadeUp 240ms ease-out both;
 }

@@ -82,6 +82,9 @@ export function buildPromptJSON(
   format: ContentFormat | string
 ): InfluencerPromptJSON {
   const preset = PROMPT_PRESETS[input.preset];
+  const normalizedReferenceInputs =
+    input.referenceImages?.filter((entry) => entry.image_id.trim().length > 0) ?? [];
+  const identityReference = normalizedReferenceInputs.find((entry) => entry.role === "identity_primary");
   const scene = input.scene ?? {
     location: preset.locationStyle,
     action: "calm editorial pose with natural body language",
@@ -111,13 +114,28 @@ export function buildPromptJSON(
       location_style: preset.locationStyle
     },
     identity_lock: {
-      reference_image_id: input.referenceImageId ?? "NO_REFERENCE_IMAGE",
+      reference_image_id:
+        identityReference?.image_id ?? input.referenceImageId ?? "NO_REFERENCE_IMAGE",
       lock_face: true,
       lock_hair: true,
       lock_skin_tone: true,
       instruction:
-        "Do not alter facial identity, hair structure, or skin tone between generations. Keep identity consistency strict across all outputs."
+        "Do not alter facial identity, hair structure, or skin tone between generations. Keep identity consistency strict across all outputs, especially when style/outfit reference images are provided."
     },
+    reference_inputs: normalizedReferenceInputs.map((entry) => ({
+      image_id: entry.image_id,
+      role: entry.role,
+      weight: entry.weight ?? 1,
+      lock_identity: entry.lockIdentity ?? entry.role === "identity_primary",
+      instruction:
+        entry.role === "identity_primary"
+          ? "Use this image as strict identity lock."
+          : entry.role === "style_outfit"
+            ? "Transfer outfit/material styling only. Do not transfer identity."
+            : entry.role === "environment_mood"
+              ? "Transfer environment mood and color atmosphere only."
+              : "Use pose guidance while preserving identity and body consistency."
+    })),
     body_consistency: {
       fixed_descriptors: input.bodyDescriptors,
       instruction:
