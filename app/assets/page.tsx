@@ -4,6 +4,8 @@ import { Surface } from "@/components/surface";
 import { prisma } from "@/lib/db";
 import { ensureDemoUser } from "@/lib/planner";
 
+export const dynamic = "force-dynamic";
+
 function readArray(value: unknown): string[] {
   if (!Array.isArray(value)) {
     return [];

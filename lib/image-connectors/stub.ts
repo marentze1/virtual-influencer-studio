@@ -8,7 +8,9 @@ export class StubImageGeneratorProvider implements ImageGeneratorProvider {
   id = "stub-provider";
   label = "Stub Provider";
 
-  async generateImage(_request: ImageGenerationRequest): Promise<ImageGenerationResult> {
+  async generateImage(request: ImageGenerationRequest): Promise<ImageGenerationResult> {
+    void request;
+
     return {
       status: "stub",
       message:

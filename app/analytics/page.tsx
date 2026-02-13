@@ -5,6 +5,8 @@ import { prisma } from "@/lib/db";
 import { ensureDemoUser } from "@/lib/planner";
 import { todayInTimezone } from "@/lib/time";
 
+export const dynamic = "force-dynamic";
+
 export default async function AnalyticsPage() {
   const user = await ensureDemoUser();
   const metrics = await prisma.metric.findMany({

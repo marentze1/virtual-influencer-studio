@@ -2,6 +2,8 @@ import { saveSettingsAction } from "@/app/actions";
 import { Surface } from "@/components/surface";
 import { ensureDemoUser } from "@/lib/planner";
 
+export const dynamic = "force-dynamic";
+
 export default async function SettingsPage() {
   const user = await ensureDemoUser();
 

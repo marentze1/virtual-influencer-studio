@@ -5,6 +5,8 @@ import { Surface } from "@/components/surface";
 import { prisma } from "@/lib/db";
 import { ensureDemoUser, getPrimaryProfile } from "@/lib/planner";
 
+export const dynamic = "force-dynamic";
+
 function toText(value: unknown): string {
   if (!Array.isArray(value)) {
     return "";

@@ -173,7 +173,7 @@ export async function createBibleFromOnboarding(userId: string, input: Onboardin
 
 export async function updateProfileDraft(
   profileId: string,
-  data: Partial<InfluencerProfile>
+  data: Prisma.InfluencerProfileUpdateInput
 ): Promise<InfluencerProfile> {
   return prisma.influencerProfile.update({
     where: { id: profileId },
@@ -305,7 +305,7 @@ export function buildDailyBrief(item: ContentCalendar, dateKey: string): DailyBr
     shotList: buildShotList(item),
     caption: item.caption,
     hashtags,
-    promptJson: item.promptJson as any,
+    promptJson: item.promptJson as unknown as DailyBriefPayload["promptJson"],
     safetyChecklist: checklist
   };
 }

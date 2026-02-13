@@ -17,7 +17,8 @@ export class GoogleTrendsLikeConnector implements TrendConnector {
   label = "Google Trends-like Adapter";
   description = "Interface stub to wire an official trend API provider later.";
 
-  async fetchSignals(_query: string): Promise<TrendSignal[]> {
+  async fetchSignals(query: string): Promise<TrendSignal[]> {
+    void query;
     return [];
   }
 }
@@ -27,7 +28,8 @@ export class RssTrendsConnector implements TrendConnector {
   label = "RSS Feed Adapter";
   description = "Reads trend signals from configured RSS feeds (stub for MVP).";
 
-  async fetchSignals(_query: string): Promise<TrendSignal[]> {
+  async fetchSignals(query: string): Promise<TrendSignal[]> {
+    void query;
     return [];
   }
 }

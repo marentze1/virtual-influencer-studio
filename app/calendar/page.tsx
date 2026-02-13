@@ -5,6 +5,7 @@ import { prisma } from "@/lib/db";
 import { ensureDemoUser, getPrimaryProfile } from "@/lib/planner";
 import { monthWindow, todayInTimezone, zonedDate } from "@/lib/time";
 
+export const dynamic = "force-dynamic";
 
 function readArray(value: unknown): string[] {
   if (!Array.isArray(value)) {
