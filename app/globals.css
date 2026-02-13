@@ -3,9 +3,9 @@
 @tailwind utilities;
 
 :root {
-  --bg-base: #eff1f5;
-  --bg-panel: rgba(255, 255, 255, 0.84);
-  --ink: #11161c;
+  --ink: #0f1722;
+  --surface: #ffffff;
+  --muted: #5f6c7b;
 }
 
 * {
@@ -19,31 +19,51 @@ body {
 }
 
 body {
-  background:
-    radial-gradient(circle at 0% 0%, #ffffff 0%, transparent 40%),
-    radial-gradient(circle at 90% 12%, #d9e9ff 0%, transparent 35%),
-    linear-gradient(160deg, #f6f7fb 0%, var(--bg-base) 100%);
   color: var(--ink);
+  background:
+    radial-gradient(1200px 800px at 110% -10%, #dbe8ff 0%, rgba(219, 232, 255, 0) 70%),
+    radial-gradient(900px 700px at -10% 20%, #eaf1ff 0%, rgba(234, 241, 255, 0) 65%),
+    linear-gradient(180deg, #f8faff 0%, #f1f4fb 60%, #edf2f9 100%);
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-family: "SF Pro Display", "Avenir Next", "Nunito Sans", "Helvetica Neue", "Segoe UI", sans-serif;
+  letter-spacing: -0.02em;
 }
 
 input,
 textarea,
 select {
-  @apply w-full rounded-xl border border-ink/15 bg-white/95 px-3 py-2 text-sm text-ink shadow-sm outline-none transition;
+  @apply w-full rounded-2xl border border-ink/15 bg-white px-3.5 py-2.5 text-sm text-ink shadow-sm outline-none transition;
+}
+
+input::placeholder,
+textarea::placeholder {
+  color: #7f8b98;
 }
 
 input:focus,
 textarea:focus,
 select:focus {
-  @apply border-ink/50 ring-2 ring-[#3f7cff]/25;
+  @apply border-ink/35 ring-4 ring-[#8db5ff]/25;
+}
+
+textarea {
+  min-height: 92px;
+  resize: vertical;
 }
 
 button {
-  @apply rounded-xl bg-ink px-4 py-2 text-sm font-medium text-stone transition hover:bg-ink/90 active:scale-[0.99];
+  @apply rounded-2xl bg-ink px-4 py-2 text-sm font-medium text-stone transition hover:bg-ink/90 active:scale-[0.99];
 }
 
 .muted-button {
-  @apply border border-ink/15 bg-white text-ink hover:border-ink/40;
+  @apply border border-ink/15 bg-white text-ink hover:border-ink/35;
 }
 
 label {
@@ -58,8 +78,9 @@ pre {
 @keyframes fadeUp {
   from {
     opacity: 0;
-    transform: translateY(8px);
+    transform: translateY(10px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);

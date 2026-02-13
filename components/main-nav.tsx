@@ -5,23 +5,23 @@ import { usePathname } from "next/navigation";
 import clsx from "clsx";
 
 const primaryLinks = [
-  { href: "/", label: "Studio" },
-  { href: "/character-lab", label: "Create" },
-  { href: "/calendar", label: "Plan" },
-  { href: "/today", label: "Execute" },
-  { href: "/assets", label: "Library" },
-  { href: "/analytics", label: "Insights" }
+  { href: "/create", label: "Create" },
+  { href: "/persona", label: "Persona" },
+  { href: "/studio", label: "Studio" }
 ];
 
-const secondaryLinks = [
-  { href: "/onboarding", label: "Onboarding" },
-  { href: "/profile", label: "Bible" },
-  { href: "/trends", label: "Trends" },
+const utilityLinks = [
+  { href: "/", label: "Home" },
+  { href: "/assets", label: "Assets" },
+  { href: "/analytics", label: "Analytics" },
   { href: "/settings", label: "Settings" }
 ];
 
 function isActive(pathname: string, href: string): boolean {
-  if (href === "/") return pathname === "/";
+  if (href === "/") {
+    return pathname === "/";
+  }
+
   return pathname === href || pathname.startsWith(`${href}/`);
 }
 
@@ -29,42 +29,42 @@ export function MainNav() {
   const pathname = usePathname();
 
   return (
-    <nav className="space-y-3">
-      <div className="grid grid-cols-3 gap-2">
-        {primaryLinks.map((link) => {
-          const active = isActive(pathname, link.href);
+    <nav className="space-y-2">
+      <div className="flex flex-wrap gap-2">
+        {primaryLinks.map((item) => {
+          const active = isActive(pathname, item.href);
           return (
             <Link
-              key={link.href}
-              href={link.href}
+              key={item.href}
+              href={item.href}
               className={clsx(
-                "rounded-xl border px-3 py-2 text-center text-sm transition",
+                "rounded-full border px-4 py-2 text-sm transition",
                 active
                   ? "border-ink bg-ink text-stone"
-                  : "border-ink/20 bg-white/70 text-ink hover:border-ink/45"
+                  : "border-ink/20 bg-white text-ink hover:border-ink/40"
               )}
             >
-              {link.label}
+              {item.label}
             </Link>
           );
         })}
       </div>
 
       <div className="flex flex-wrap gap-2">
-        {secondaryLinks.map((link) => {
-          const active = isActive(pathname, link.href);
+        {utilityLinks.map((item) => {
+          const active = isActive(pathname, item.href);
           return (
             <Link
-              key={link.href}
-              href={link.href}
+              key={item.href}
+              href={item.href}
               className={clsx(
-                "rounded-full border px-3 py-1.5 text-xs uppercase tracking-[0.08em] transition",
+                "rounded-full border px-3 py-1.5 text-xs uppercase tracking-[0.1em] transition",
                 active
-                  ? "border-ink/90 bg-ink/90 text-stone"
-                  : "border-ink/15 bg-white/60 text-ink/80 hover:border-ink/40"
+                  ? "border-ink/25 bg-ink/10 text-ink"
+                  : "border-ink/10 bg-white text-ink/60 hover:border-ink/30"
               )}
             >
-              {link.label}
+              {item.label}
             </Link>
           );
         })}
