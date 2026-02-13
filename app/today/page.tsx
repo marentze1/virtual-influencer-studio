@@ -1,8 +1,5 @@
 import { formatInTimeZone } from "date-fns-tz";
-import {
-  generateDailyBriefAction,
-  saveTextAssetAction
-} from "@/app/actions";
+import { generateDailyBriefAction, saveTextAssetAction } from "@/app/actions";
 import { DailyBriefExport } from "@/components/daily-brief-export";
 import { Surface } from "@/components/surface";
 import { prisma } from "@/lib/db";
@@ -11,14 +8,22 @@ import { todayInTimezone, zonedDate } from "@/lib/time";
 import type { DailyBriefPayload } from "@/lib/types";
 
 type PageProps = {
-  searchParams?:
-    | {
-        date?: string;
-      }
-    | Promise<{
-        date?: string;
-      }>;
+  searchParams?: Promise<{
+    [key: string]: string | string[] | undefined;
+  }>;
 };
+
+function readSearchParam(
+  params: { [key: string]: string | string[] | undefined },
+  key: string
+): string | undefined {
+  const value = params[key];
+  if (Array.isArray(value)) {
+    return value[0];
+  }
+
+  return value;
+}
 
 function parsePayload(value: unknown, dateKey: string): DailyBriefPayload | null {
   if (!value || typeof value !== "object") {
@@ -66,8 +71,8 @@ function parsePayload(value: unknown, dateKey: string): DailyBriefPayload | null
 
 export default async function TodayPage({ searchParams }: PageProps) {
   const user = await ensureDemoUser();
-  const params = await Promise.resolve(searchParams);
-  const dateKey = params?.date ?? todayInTimezone(user.timezone);
+  const params = (await searchParams) ?? {};
+  const dateKey = readSearchParam(params, "date") ?? todayInTimezone(user.timezone);
 
   const dayStart = zonedDate(dateKey, user.timezone);
   const dayEnd = new Date(dayStart);
@@ -110,11 +115,13 @@ export default async function TodayPage({ searchParams }: PageProps) {
         </form>
         {calendarItem ? (
           <p className="mt-3 text-sm text-ink/70">
-            Source plan: {formatInTimeZone(calendarItem.date, user.timezone, "yyyy-MM-dd")} · {calendarItem.format}
+            Source plan: {formatInTimeZone(calendarItem.date, user.timezone, "yyyy-MM-dd")} ·{" "}
+            {calendarItem.format}
           </p>
         ) : (
           <p className="mt-3 text-sm text-ink/70">
-            No calendar item for this date yet. Generation will create a single day plan from your profile.
+            No calendar item for this date yet. Generation will create a single day plan from your
+            profile.
           </p>
         )}
       </Surface>
@@ -137,7 +144,9 @@ export default async function TodayPage({ searchParams }: PageProps) {
                 <p className="text-xs uppercase tracking-[0.1em] text-ink/55">Shot list</p>
                 <ol className="mt-2 space-y-2 text-sm text-ink/85">
                   {payload.shotList.map((shot, index) => (
-                    <li key={shot}>{index + 1}. {shot}</li>
+                    <li key={shot}>
+                      {index + 1}. {shot}
+                    </li>
                   ))}
                 </ol>
                 <p className="mt-4 text-xs uppercase tracking-[0.1em] text-ink/55">
@@ -145,7 +154,9 @@ export default async function TodayPage({ searchParams }: PageProps) {
                 </p>
                 <ul className="mt-2 space-y-2 text-sm text-ink/85">
                   {payload.safetyChecklist.map((item) => (
-                    <li key={item.label}>{item.passed ? "[OK]" : "[ ]"} {item.label}</li>
+                    <li key={item.label}>
+                      {item.passed ? "[OK]" : "[ ]"} {item.label}
+                    </li>
                   ))}
                 </ul>
               </div>
